@@ -1,2 +1,0 @@
-env:
-	pip install virtualenv

@@ -1,0 +1,16 @@
+import json
+
+class config:
+
+    config = dict()
+
+    def __init__(self):
+        global config
+        file_str = ""
+        with open("config/config.json", "r", encoding='ISO-8859-1') as file:
+            configJSON = json.load(file)
+        self.config["minecraft"] = configJSON["minecraft"]["regular"]
+        self.config["paths"] = configJSON["paths_config"]
+        self.config["sql"] = configJSON["sql_config"]
+
+config()
