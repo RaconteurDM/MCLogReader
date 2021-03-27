@@ -1,21 +1,42 @@
 # coding=utf8
 # the above tag defines encoding for this document and is for Python 2.x compatibility
 
-import re
+import sys
 
-regex = r"(.+\\+)*[0-9]*-[0-9]*-[0-9]*-[0-9]*\.log"
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-test_str = "dqs\\2019-11-16-2.log"
+from PyQt5.QtWidgets import (
+    QApplication, QDialog, QMainWindow, QMessageBox
+)
 
-matches = re.finditer(regex, test_str, re.MULTILINE)
+from PyQt5.uic import loadUi
 
-for matchNum, match in enumerate(matches, start=1):
-    
-    print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
-    
-    for groupNum in range(0, len(match.groups())):
-        groupNum = groupNum + 1
-        
-        print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(413, 299)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        # Snip...
 
-# Note: for Python 2.7 compatibility, use ur"" to prefix the regex and u"" to prefix the test string and substitution.
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Sample Editor"))
+        self.menu_File.setTitle(_translate("MainWindow", "&File"))
+        # Snip...
+
+class Window(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.connectSignalsSlots()
+
+    def connectSignalsSlots(self):
+        pass
+
+if __name__ == "__main__":
+
+    app = QApplication(sys.argv)
+    win = Window()
+    win.show()
+    sys.exit(app.exec())

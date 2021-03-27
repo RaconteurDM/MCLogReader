@@ -1,46 +1,58 @@
 # -*-coding:utf-8 -*
 
 import re
-from ..time import date
-from ..state import state
-from .line import line
+from ..time import Date
+from ..state import State
+from .line import Line
+from .serveur import Serveur
+from .. import Sql
 import codecs
 
-class file:
+class File:
 
     reVerif = re.compile(r"(.+(\\|/)+)*[0-9]*-[0-9]*-[0-9]*-[0-9]*\.log")
     reFilename = re.compile(r"[0-9]*-[0-9]*-[0-9]*-[0-9]*")
 
+    lastServIp = "Unkown"
+    lastServCompleteIp = "Unknown"
+
+    ipSet_id = -1
+
     def __init__(self, filepath):
-        self.state = state.INVALID
+        if self.ipSet_id == -1:
+            self.ipSet_id = Serveur(self.lastServIp, self.lastServCompleteIp).serv_ip_id
+        self.state = State.INVALID
         self.filename = "Invalid"
         self.rawLines = list()
         self.lines = list()
-        self.lastServIp = "Unknown"
-        self.lastServCompleteIp = "Unknown"
+
+        match = self.reFilename.search(filepath)
+        self.filename = match.group()
+
+        if Sql.exist("files", ["Name",], [self.filename,]):
+            return
 
         if (self.reVerif.match(filepath) is not None):
-            self.state = state.VALID
-
-            match = self.reFilename.search(filepath)
-            self.filename = match.group()
+            self.state = State.VALID
 
             file = codecs.open(filepath, "r", encoding='ISO-8859-1')
             self.rawLines = file.readlines()
             file.close()
 
-            self.date = date(self.filename)
+            self.date = Date(self.filename)
             self.num = self.date.num
 
             self.listAllLines()
 
     def listAllLines(self):
         for rawLine in self.rawLines:
-            newLine = line(rawLine)
-            if (line.type == "Connection"):
+            newLine = Line(rawLine)
+            if (newLine.type == "connection"):
                 self.lastServIp = newLine.ip
                 self.lastServCompleteIp = newLine.completeIp
+                self.ipSet_id = Serveur(self.lastServIp, self.lastServCompleteIp).serv_ip_id
             else:
                 newLine.ip = self.lastServIp
-                newLine.completeIp = newLine.completeIp
-            self.lines.append(line(rawLine))
+                newLine.completeIp = self.lastServCompleteIp
+            newLine.ipSet = self.ipSet_id
+            self.lines.append(newLine)

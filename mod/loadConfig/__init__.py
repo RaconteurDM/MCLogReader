@@ -1,1 +1,1 @@
-from .getConfig import config
+from .getConfig import Config

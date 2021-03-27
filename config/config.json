@@ -27,28 +27,26 @@
         }
     },
     "paths_config": {
-        "db_path": "./db/test.txt",
+        "db_path": "./db/db.db",
         "original_logs_path": "C:/Users/paulb/AppData/Roaming/.minecraft/logs/",
         "logs_directory_path": "./logs"
     },
     "sql_config": {
         "files": {
             "create": "CREATE TABLE IF NOT EXISTS files(id integer PRIMARY KEY, Name text UNIQUE, Date text, FileNumber integer)",
-            "insert": "INSERT INTO files (Name, Date, FileNumber) VALUES(?,?,?)",
-            "fetchall": "select * from files",
-            "fetchbyvalue": "select * from files WHERE VALUE=?"
-        },
-        "lines": {
-            "create": "CREATE TABLE IF NOT EXISTS lines(id integer PRIMARY KEY, file_id integer, Date text, Serveur text, Type text, Time text, message text, FOREIGN KEY (file_id) REFERENCES files (id) ON UPDATE CASCADE ON DELETE CASCADE)",
-            "insert": "INSERT INTO lines (file_id, Date, Type, Time, message, Serveur) VALUES(?,?,?,?,?,?)",
-            "fetchall": "select * from lines",
-            "fetchbyvalue": "select * from lines WHERE VALUE=?"
+            "insert": "INSERT INTO files (Name, Date, FileNumber) VALUES(?,?,?)"
         },
         "serveurs": {
-            "create": "CREATE TABLE IF NOT EXISTS serveurs(id integer PRIMARY KEY, server_id text UNIQUE, server_complete_id text UNIQUE",
-            "insert": "INSERT INTO serveurs (server_id, server_complete_id) VALUES(?,?)",
-            "fetchall": "select * from serveurs",
-            "fetchbyvalue": "select * from serveurs WHERE VALUE=?"
+            "create": "CREATE TABLE IF NOT EXISTS serveurs(id integer PRIMARY KEY, name text UNIQUE, desc)",
+            "insert": "INSERT INTO serveurs (name, desc) VALUES(?,?)"
+        },
+        "serveurs_ip": {
+            "create": "CREATE TABLE IF NOT EXISTS serveurs_ip(id integer PRIMARY KEY, server_ip text, server_complete_ip text UNIQUE, serveur_name text, FOREIGN KEY (serveur_name) REFERENCES serveurs (name) ON UPDATE CASCADE ON DELETE CASCADE)",
+            "insert": "INSERT INTO serveurs_ip (serveur_name, server_ip, server_complete_ip) VALUES(?,?,?)"
+        },
+        "lines": {
+            "create": "CREATE TABLE IF NOT EXISTS lines(id integer PRIMARY KEY, file_id integer, Date text, Serveur_id integer, Type text, Time text, message text, FOREIGN KEY (file_id) REFERENCES files (id) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (Serveur_id) REFERENCES serveurs_ip (id) ON UPDATE CASCADE ON DELETE CASCADE)",
+            "insert": "INSERT INTO lines (file_id, Date, Type, Time, message, Serveur_id) VALUES(?,?,?,?,?,?)"
         }
     }
 }
